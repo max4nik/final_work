@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'data.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,28 +31,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Random random = Random();
 
   // 0 is grey, 1 is blackgrey 2 is green
-  List<int> colors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-  void _changeBehaviour(e, special_number, counter_list) {
-
-    print(colors);
-    print(special_number);
+  void _changeBehaviour(int e, special_number, counter_list) {
+    int indexCurrentElement = e - 1;
+    if (colorsList[indexCurrentElement] == 2 || lastClickedElement == indexCurrentElement){
+      return;
+    }
+    lastClickedElement = indexCurrentElement;
     setState(() {
-      colors[e - 1] == 1;
-      if (counter_list[e - 1] == special_number) {
-        colors[e - 1] == 2;
+      colorsList[indexCurrentElement] = 1;
+      if (indexCurrentElement == special_number) {
+        colorsList[indexCurrentElement] = 2;
       }
     });
-    var count = colors.where((c) => c == 2).toList().length;
-    if (count == colors.length){
-      colors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    var count = colorsList.where((c) => c == 2).toList().length;
+    if (count == colorsList.length){
+      restartGame();
     }
+    clickedNoneSpecialElement(indexCurrentElement);
+    print("AFTER " + specialElement.toString() + ' ' + (indexCurrentElement).toString());
+
+
   }
 
   Widget _item(int e, special_number, counter_list) {
+    print(colorsList);
     return Container(
       width: 40,
       height: 40,
@@ -60,12 +65,12 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           _changeBehaviour(e, special_number, counter_list);
         },
-        child: Text(colors[e - 1] == 1 ? '------------------' : 'Element $e'),
+        child: Text(colorsList[e - 1] == 1 ? '⠀⠀⠀⠀⠀⠀⠀' : 'Element $e'),
         style: TextButton.styleFrom(
           textStyle: TextStyle(
-              backgroundColor: colors[e - 1] == 0
+              backgroundColor: colorsList[e - 1] == 0
                   ? Colors.black26
-                  : (colors[e - 1] == 1 ? Colors.grey : Colors.green)),
+                  : (colorsList[e - 1] == 1 ? Colors.grey : Colors.green)),
         ),
       ),
     );
@@ -73,16 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    int special_number = random.nextInt(10) + 1;
-    for (int i = 1; i <= 10; i++) {
-      if (colors[i - 1] == 2){
-        special_number = random.nextInt(10) + 1;
-      }
-    }
     var counter_list = [];
-    for (int i = 1; i <= special_number; i++) {
+    for (int i = 1; i <= colorsLen; i++) {
       counter_list.add(i);
     }
+    print(counter_list);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -94,10 +94,10 @@ class _MyHomePageState extends State<MyHomePage> {
             Container(
                 padding: const EdgeInsets.only(left: 8, right: 8),
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 2,
+                height: MediaQuery.of(context).size.height / 1.5,
                 child: ListView(
                     children: counter_list
-                        .map((e) => (_item(e, special_number, counter_list)))
+                        .map((e) => (_item(e, specialElement, counter_list)))
                         .toList()))
           ],
         ),
